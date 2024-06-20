@@ -31,7 +31,7 @@ from airflow.operators.bash_operator import BashOperator
 # These args will get passed on to each operator
 # You can override them on a per-task basis during operator initialization
 default_args = {
-    'owner': 'airflow',
+    'owner': 'Ishwell',
     'depends_on_past': False,
     'start_date': airflow.utils.dates.days_ago(2),
     'email': ['airflow@example.com'],
@@ -57,9 +57,9 @@ default_args = {
 
 
 dag = DAG(
-    'tutorial',
+    'my_first_DAG',
     default_args=default_args,
-    description='A simple tutorial DAG',
+    description='My very first DAG',
     schedule_interval=timedelta(days=1),
 )
 
@@ -73,8 +73,8 @@ dag = DAG(
 
 # t1, t2 and t3 are examples of tasks created by instantiating operators
 t1 = BashOperator(
-    task_id='print_date',
-    bash_command='date',
+    task_id='Message',
+    bash_command='echo "Hello, this is a test"',
     dag=dag,
 )
 
@@ -83,33 +83,43 @@ t1.doc_md = """\
 You can document your task using the attributes `doc_md` (markdown),
 `doc` (plain text), `doc_rst`, `doc_json`, `doc_yaml` which gets
 rendered in the UI's Task Instance Details page.
-![img](http://montcs.bloomu.edu/~bobmon/Semesters/2012-01/491/import%20soul.png)
+![img](https://media.newyorker.com/photos/59095bb86552fa0be682d9d0/master/pass/Monkey-Selfie.jpg)
 """
 
-dag.doc_md = __doc__
+dag.doc_md = """\
+#### DAG Documentation
+You can document your task using the attributes `doc_md` (markdown),
+`doc` (plain text), `doc_rst`, `doc_json`, `doc_yaml` which gets
+rendered in the UI's Task Instance Details page.
+![img](https://media.newyorker.com/photos/59095bb86552fa0be682d9d0/master/pass/Monkey-Selfie.jpg)
+"""
 
 t2 = BashOperator(
-    task_id='sleep',
-    depends_on_past=False,
-    bash_command='sleep 5',
+    task_id='Message_2',
+    bash_command='echo "Did you get this one too?"',
     dag=dag,
 )
-
-templated_command = """
-{% for i in range(5) %}
-    echo "{{ ds }}"
-    echo "{{ macros.ds_add(ds, 7)}}"
-    echo "{{ params.my_param }}"
-{% endfor %}
-"""
 
 t3 = BashOperator(
-    task_id='templated',
-    depends_on_past=False,
-    bash_command=templated_command,
-    params={'my_param': 'Hello World!'},
+    task_id='Message_3',
+    bash_command='echo"Runs parallel with message_2"',
     dag=dag,
 )
+# templated_command = """
+# {% for i in range(5) %}
+#     echo "{{ ds }}"
+#     echo "{{ macros.ds_add(ds, 7)}}"
+#     echo "{{ params.my_param }}"
+# {% endfor %}
+# """
+
+# t3 = BashOperator(
+#     task_id='templated',
+#     depends_on_past=False,
+#     bash_command=templated_command,
+#     params={'my_param': 'Hello World!'},
+#     dag=dag,
+# )
 
 t1 >> [t2, t3]
 
